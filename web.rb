@@ -39,14 +39,37 @@ get '/green' do
   str
 end
 
+def authorized?
+  @auth ||=  Rack::Auth::Basic::Request.new(request.env)
+  @auth.provided? && @auth.basic? && @auth.credentials && @auth.credentials == ["admin","admin123"]
+end
+
+def protected!
+  unless authorized?
+    response['WWW-Authenticate'] = %(Basic realm="Restricted Area")
+    throw(:halt, [401, "Oops... we need your login name & password\n"])
+  end
+end
+
+
+admin_str = "<center> <br><br><a href='/off' style='font-size:30px'>off<a> <br><br><br> <br><br><a href='/on' style='font-size:30px'>on<a></center>"
+
+
+get '/admin' do
+  protected!
+  admin_str
+end
+
 get '/on' do
+  protected!
   channel.default_exchange.publish(ON, routing_key: queue.name)
-  str
+  admin_str
 end
 
 get '/off' do
+  protected!
   channel.default_exchange.publish(OFF, routing_key: queue.name)
-  str
+  admin_str
 end
 
 get '/alert' do
