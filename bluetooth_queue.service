@@ -1,0 +1,13 @@
+[Unit]
+Description=HS: Bluetooth communication Service
+
+[Service]
+User=coderhs
+Group=coderhs
+WorkingDirectory=/home/coderhs/sandbox/control-led-string
+Restart=always
+Type=simple
+ExecStart=/home/coderhs/sandbox/control-led-string/bluetooth_queue.sh > /home/coderhs/sandbox/control-led-string/service.lgo
+
+[Install]
+WantedBy=multi-user.target
